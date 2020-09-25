@@ -2,11 +2,11 @@
 //TODO props validation
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 
 import FilteredPersons from "./components/FilteredPersons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import { getAll, create, update, deleteObject } from "./services/persons";
 
 const App = () => {
   const [ persons, setPersons ] = useState([]);
@@ -14,11 +14,14 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState("");
   const [ nameFilter, setNameFilter ] = useState("");
 
-  useEffect(() =>
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response => setPersons(response.data)))
-  , []);
+  useEffect(() => {
+    getAll()
+      .then(data => setPersons(data))
+      .catch(error => {
+        console.log(error);
+        alert("Error: couldn't get the list of phonebook names from server.");
+      });
+  }, []);
 
   return (
     <div>
@@ -35,11 +38,16 @@ const App = () => {
         setNewName={setNewName}
         setNewNumber={setNewNumber}
         setPersons={setPersons}
+        create={create}
+        update={update}
       />
 
       <h3>Numbers</h3>
       <FilteredPersons
-        filterName={nameFilter} persons={persons}
+        filterName={nameFilter}
+        persons={persons}
+        setPersons={setPersons}
+        deleteObject={deleteObject}
       />
     </div>
   );
