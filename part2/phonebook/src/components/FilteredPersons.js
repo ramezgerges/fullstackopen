@@ -3,17 +3,28 @@
 
 import React from "react";
 
-const FilteredPersons = ({ persons, filterName, deleteObject, setPersons }) => {
+const FilteredPersons = ({ persons, filterName, deleteObject, setPersons, setNotificationMessage }) => {
   persons = persons.filter(person => person.name.toLowerCase().includes(filterName));
 
   const deletePersonFactory = person => () => {
     const result = window.confirm(`Delete ${person.name}?`);
     if (result) {
       deleteObject(person.id)
-        .then(() => setPersons(persons.filter(p => person.id !== p.id)))
+        .then(() => {
+          setPersons(persons.filter(p => person.id !== p.id));
+          setNotificationMessage({
+            text: `Success: deleted ${person.name}`,
+            type: "success"
+          });
+          setTimeout(() => setNotificationMessage(null), 5000);
+        })
         .catch(error => {
           console.log(error);
-          alert(`Error: couldn't delete ${person.name}`);
+          setNotificationMessage({
+            text: `Error: couldn't delete ${person.name}`,
+            type: "error"
+          });
+          setTimeout(() => setNotificationMessage(null), 5000);
         });
     }
   };

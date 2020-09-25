@@ -3,7 +3,8 @@
 
 import React from "react";
 
-const PersonForm = ({ newName, newNumber, persons, setNewName, setNewNumber, setPersons, create, update }) => {
+const PersonForm = ({ newName, newNumber, persons, setNewName, setNewNumber,
+  setPersons, create, update, setNotificationMessage }) => {
   const addPerson = (event) => {
     event.preventDefault();
 
@@ -16,20 +17,42 @@ const PersonForm = ({ newName, newNumber, persons, setNewName, setNewNumber, set
         update(person.id, {
           name: newName,
           number: newNumber
-        }).then((data) => setPersons(persons.map(p => p.id === person.id? data : p)))
+        }).then((data) => {
+          setPersons(persons.map(p => p.id === person.id? data : p));
+          setNotificationMessage({
+            text: `Success: updated ${data.name}`,
+            type: "success"
+          });
+          setTimeout(() => setNotificationMessage(null), 5000);
+        })
           .catch(error => {
             console.log(error);
-            alert(`Error: couldn't update ${newName}`);
+            setNotificationMessage({
+              text: `Error: couldn't update ${newName}`,
+              type: "error"
+            });
+            setTimeout(() => setNotificationMessage(null), 5000);
           });
       }
     } else {
       create({
         name: newName,
         number: newNumber
-      }).then((data) => setPersons(persons.concat(data)))
+      }).then((data) => {
+        setPersons(persons.concat(data));
+        setNotificationMessage({
+          text: `Success: added ${data.name}`,
+          type: "success"
+        });
+        setTimeout(() => setNotificationMessage(null), 5000);
+      })
         .catch(error => {
           console.log(error);
-          alert(`Error: couldn't add ${newName}`);
+          setNotificationMessage({
+            text: `Error: couldn't add ${newName}`,
+            type: "error"
+          });
+          setTimeout(() => setNotificationMessage(null), 5000);
         });
     }
 

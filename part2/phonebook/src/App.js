@@ -7,19 +7,25 @@ import FilteredPersons from "./components/FilteredPersons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import { getAll, create, update, deleteObject } from "./services/persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [ persons, setPersons ] = useState([]);
   const [ newName, setNewName ] = useState("");
   const [ newNumber, setNewNumber ] = useState("");
   const [ nameFilter, setNameFilter ] = useState("");
+  const [ notificationMessage, setNotificationMessage ] = useState(null);
 
   useEffect(() => {
     getAll()
       .then(data => setPersons(data))
       .catch(error => {
         console.log(error);
-        alert("Error: couldn't get the list of phonebook names from server.");
+        setNotificationMessage({
+          text: "Error: couldn't get the list of phonebook names from server.",
+          type: "error"
+        });
+        setTimeout(() => setNotificationMessage(null), 5000);
       });
   }, []);
 
@@ -40,7 +46,11 @@ const App = () => {
         setPersons={setPersons}
         create={create}
         update={update}
+        setNotificationMessage={setNotificationMessage}
       />
+
+      <br/>
+      <Notification message={notificationMessage} />
 
       <h3>Numbers</h3>
       <FilteredPersons
@@ -48,6 +58,7 @@ const App = () => {
         persons={persons}
         setPersons={setPersons}
         deleteObject={deleteObject}
+        setNotificationMessage={setNotificationMessage}
       />
     </div>
   );
