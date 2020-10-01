@@ -1,95 +1,122 @@
-import express from "express";
-import morgan from "morgan";
-import cors from "cors";
-
-const app = express();
-app.use(cors());
-app.use(express.static("build"));
-app.use(express.json());
+const express = require("express");
+const morgan = require("morgan");
+//const cors = require("cors");
+require("dotenv").config();
+const Person = require("./models/person");
 
 morgan.token("json", (req) => {
     if (req.method === "POST" && "content-type" in req.headers &&
         req.headers["content-type"].includes("application/json"))
         return JSON.stringify(req.body);
 });
+
+const app = express();
+//app.use(cors());
+app.use(express.static("build"));
+app.use(express.json());
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :json"));
 
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    }
-];
-
-app.get("/api/persons", (req, res) => {
-    res.json(persons);
+app.get("/api/persons", (req, res, next) => {
+    Person
+        .find({})
+        .then(persons => res.json(persons))
+        .catch(error => next(error));
 });
 
-app.get("/info", (req, res) => {
-    res.send(
-        `<p>Phonebook has info for ${persons.length} people</p>
-<p>${new Date()}</p>`
-    );
+app.get("/info", (req, res, next) => {
+    Person.find({})
+        .then(persons => {
+            const length = persons.length;
+            res.send(
+                `<p>Phonebook has info for ${length === 1 ? "1 person" : `${length} people`}</p>
+                        <p>${new Date()}</p>`
+            );
+        })
+        .catch(error => next(error));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const person = persons.find(person => person.id === id);
-    if (person) res.json(person);
-    else res.status(404).end();
+app.get("/api/persons/:id", (req, res, next) => {
+    Person
+        .findById(req.params.id)
+        .then(person => {
+            if (person) res.json(person);
+            else res.status(404).end();
+        })
+        .catch(error => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    persons = persons.filter(person => person.id !== id);
-    res.status(204).end();
+app.delete("/api/persons/:id", (req, res, next) => {
+    Person
+        .findByIdAndRemove(req.params.id)
+        .then(() => {
+            res.status(204).end();
+        })
+        .catch(error => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
-    const person = { ...req.body };
-    if (!("name" in person)) {
+app.put("/api/persons/:id", (req, res, next) => {
+    const body = req.body;
+    if (!(body.name)) {
         return res.status(400).json({
             error: "name must be included"
         });
-    }
-    if (!("number" in person)) {
+    } else if (!body.number) {
         return res.status(400).json({
             error: "number must be included"
         });
     }
-    if (persons.find(p => p.name === person.name)) {
+
+    const person = new Person({
+        _id: req.params.id,
+        name: body.name,
+        number: body.number
+    });
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            if (updatedPerson) res.json(updatedPerson);
+            else res.status(404).end();
+        })
+        .catch(error => next(error));
+});
+
+app.post("/api/persons", (req, res, next) => {
+    const body = req.body;
+    if (!(body.name)) {
         return res.status(400).json({
-            error: "name must be unique"
+            error: "name must be included"
+        });
+    } else if (!body.number) {
+        return res.status(400).json({
+            error: "number must be included"
         });
     }
 
-    //from MDN
-    const getRandomInt = (min, max) => {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-    };
+    const person = new Person({
+        name: body.name,
+        number: body.number
+    });
 
-    person.id = getRandomInt(1, Number.MAX_SAFE_INTEGER);
-    persons.push(person);
-    res.json(person);
+    person
+        .save()
+        .then(savedPerson => res.json(savedPerson))
+        .catch(error => next(error));
 });
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === "CastError") {
+        console.log("here");
+        return res.status(400).send({ error: "malformatted id" });
+    } else if (error.name === "DocumentNotFoundError") {
+        return  res.status(404).end();
+    } else {
+        res.status(500).end();
+    }
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
