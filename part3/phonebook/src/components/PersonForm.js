@@ -28,7 +28,7 @@ const PersonForm = ({ newName, newNumber, persons, setNewName, setNewNumber,
           .catch(error => {
             console.log(error);
             setNotificationMessage({
-              text: `Error: couldn't update ${newName}`,
+              text: error.response.data.error,
               type: "error"
             });
             setTimeout(() => setNotificationMessage(null), 5000);
@@ -49,7 +49,7 @@ const PersonForm = ({ newName, newNumber, persons, setNewName, setNewNumber,
         .catch(error => {
           console.log(error);
           setNotificationMessage({
-            text: `Error: couldn't add ${newName}`,
+            text: error.response.data.error,
             type: "error"
           });
           setTimeout(() => setNotificationMessage(null), 5000);
