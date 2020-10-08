@@ -25,5 +25,8 @@
         "ignoreRegExpLiterals": true
       }
     ]
+  },
+  "parserOptions": {
+      "ecmaVersion": 2020
   }
 }
