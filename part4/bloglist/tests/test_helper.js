@@ -1,4 +1,4 @@
-const initialDB = [
+const initialBlogs = [
   {
     _id: "5a422a851b54a676234d17f7",
     title: "React patterns",
@@ -53,4 +53,17 @@ const newBlog = {
   __v: 0
 };
 
-module.exports = { initialDB, newBlog };
+const initialUsers = [
+  {
+    username: "root",
+    name: "root",
+    password: "rootpassword"
+  },
+  {
+    username: "leaddev",
+    name: "devsname",
+    password: "devpassword"
+  }
+];
+
+module.exports = { initialBlogs, newBlog, initialUsers };

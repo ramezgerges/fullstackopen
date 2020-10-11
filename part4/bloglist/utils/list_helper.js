@@ -1,7 +1,7 @@
 const _ = require("lodash");
 
 // eslint-disable-next-line no-unused-vars
-const dummy = (blogs) => {
+const dummy = () => {
   return 1;
 };
 

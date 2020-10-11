@@ -19,6 +19,11 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
   }
 });
 
@@ -26,9 +31,9 @@ blogSchema.plugin(uniqueValidator);
 
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString(); // eslint-disable-line no-underscore-dangle
-    delete returnedObject._id; // eslint-disable-line no-underscore-dangle
-    delete returnedObject.__v; // eslint-disable-line no-underscore-dangle
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
   }
 });
 

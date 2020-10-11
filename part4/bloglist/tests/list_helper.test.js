@@ -1,7 +1,7 @@
 const listHelper = require("../utils/list_helper");
 const helper = require("./test_helper");
 
-const blogs = helper.initialDB.concat(helper.newBlog);
+const blogs = helper.initialBlogs.concat(helper.newBlog);
 
 describe("Dummy tests", () => {
   test("dummy returns one", () => {
