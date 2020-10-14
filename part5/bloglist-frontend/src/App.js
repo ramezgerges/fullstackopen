@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Blogs from "./components/Blogs";
 import LoginForm from "./components/LoginForm";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
+import blogService from "./services/blogService";
+import loginService from "./services/loginService";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -56,9 +56,10 @@ const App = () => {
         <Blogs
           name={user.name}
           setUser={setUser}
-          create={blogService.create}
+          blogService={blogService}
           message={message}
           setMessage={setMessage}
+          username={user.username}
         />
       )}
     </div>

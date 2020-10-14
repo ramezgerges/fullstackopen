@@ -1,14 +1,86 @@
 import React, { useEffect, useState } from "react";
-import NewBlog from "./NewBlog";
+import NewBlogForm from "./NewBlogForm";
 import Notification from "./Notification";
-import blogService from "../services/blogs";
+import Blog from "./Blog";
+import { PropTypes } from "prop-types";
 
-const Blogs = ({ name, create, setUser, message, setMessage }) => {
+const Blogs = ({
+  name,
+  username,
+  blogService,
+  setUser,
+  message,
+  setMessage,
+}) => {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    blogService
+      .getAll()
+      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
+      .catch(() =>
+        setMessage({
+          type: "error",
+          text: "Error fetching blogs.",
+        })
+      );
+  }, [blogService, setMessage]);
+
+  const updateBlogs = async () => {
+    try {
+      const blogs = await blogService.getAll();
+      setBlogs(blogs.sort((a, b) => b.likes - a.likes));
+    } catch (e) {
+      setMessage({
+        type: "error",
+        text: "Error updating blogs.",
+      });
+      console.log(e);
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const likeOnClick = async (index) => {
+    try {
+      const blog = blogs[index];
+      await blogService.update(blog.id);
+      const updatedBlogs = [...blogs];
+      updatedBlogs[index].likes++;
+      setBlogs(updatedBlogs);
+      setMessage({
+        type: "success",
+        text: `Blog ${blog.title} likes updated.`,
+      });
+      setTimeout(() => setMessage(null), 5000);
+    } catch (e) {
+      setMessage({
+        type: "error",
+        text: "Error liking blog.",
+      });
+    }
+    setTimeout(() => setMessage(null), 5000);
+    await updateBlogs();
+  };
+
+  const removeOnClick = async (index) => {
+    try {
+      const blog = blogs[index];
+      if (
+        window.confirm(
+          `Are you sure you want to delete ${blog.title} by ${blog.author}?`
+        )
+      ) {
+        await blogService.deleteObject(blog.id);
+        setBlogs(blogs.splice(index, 1));
+      }
+    } catch (e) {
+      setMessage({
+        type: "error",
+        text: "Error deleting blog.",
+      });
+    }
+    await updateBlogs();
+  };
 
   return (
     <div>
@@ -24,21 +96,33 @@ const Blogs = ({ name, create, setUser, message, setMessage }) => {
         }}
       />
       <h2>create new</h2>
-      <NewBlog
-        create={create}
+      <NewBlogForm
+        create={blogService.create}
         setBlogs={setBlogs}
         setMessage={setMessage}
         blogs={blogs}
       />
-      <ul>
-        {blogs.map((blog) => (
-          <li key={blog.id}>
-            {blog.title} {blog.author}
-          </li>
-        ))}
-      </ul>
+      <br />
+      {blogs.map((blog, index) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          update={() => likeOnClick(index)}
+          deleteBlog={() => removeOnClick(index)}
+          removable={username === blog.user.username}
+        />
+      ))}
     </div>
   );
+};
+
+Blogs.propTypes = {
+  name: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+  blogService: PropTypes.object.isRequired,
+  setUser: PropTypes.func.isRequired,
+  message: PropTypes.object,
+  setMessage: PropTypes.func.isRequired,
 };
 
 export default Blogs;

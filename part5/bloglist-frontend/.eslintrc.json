@@ -2,7 +2,22 @@
   "env": {
     "browser": true,
     "es6": true,
-    "es2020": true
+    "es2020": true,
+    "jest/globals": true
   },
-  "extends": ["react-app", "plugin:prettier/recommended", "prettier/react"]
+  "extends": [
+    "eslint:recommended",
+    "react-app",
+    "plugin:react/recommended",
+    "plugin:jest/recommended",
+    "plugin:jest/style",
+    "plugin:prettier/recommended",
+    "prettier/react"
+  ],
+  "plugins": ["jest"],
+  "rules": {
+    "react/prop-types": 0,
+    "no-console": 0,
+    "eqeqeq": "error"
+  }
 }

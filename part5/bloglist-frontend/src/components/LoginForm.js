@@ -1,7 +1,8 @@
 import React from "react";
 import Notification from "./Notification";
+import { PropTypes } from "prop-types";
 
-const loginForm = ({
+const LoginForm = ({
   username,
   password,
   setUsername,
@@ -34,4 +35,13 @@ const loginForm = ({
   </form>
 );
 
-export default loginForm;
+LoginForm.propTypes = {
+  username: PropTypes.string.isRequired,
+  password: PropTypes.string.isRequired,
+  setUsername: PropTypes.func.isRequired,
+  setPassword: PropTypes.func.isRequired,
+  handleLogin: PropTypes.func.isRequired,
+  message: PropTypes.object,
+};
+
+export default LoginForm;
