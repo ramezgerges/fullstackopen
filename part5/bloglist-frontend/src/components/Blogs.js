@@ -4,14 +4,7 @@ import Notification from "./Notification";
 import Blog from "./Blog";
 import { PropTypes } from "prop-types";
 
-const Blogs = ({
-  name,
-  username,
-  blogService,
-  setUser,
-  message,
-  setMessage,
-}) => {
+const Blogs = ({ name, blogService, setUser, message, setMessage }) => {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
@@ -46,7 +39,7 @@ const Blogs = ({
       await blogService.update(blog.id);
       const updatedBlogs = [...blogs];
       updatedBlogs[index].likes++;
-      setBlogs(updatedBlogs);
+      setBlogs(updatedBlogs.sort((a, b) => b.likes - a.likes));
       setMessage({
         type: "success",
         text: `Blog ${blog.title} likes updated.`,
@@ -59,7 +52,7 @@ const Blogs = ({
       });
     }
     setTimeout(() => setMessage(null), 5000);
-    await updateBlogs();
+    updateBlogs();
   };
 
   const removeOnClick = async (index) => {
@@ -79,6 +72,7 @@ const Blogs = ({
         text: "Error deleting blog.",
       });
     }
+    setTimeout(() => setMessage(null), 5000);
     await updateBlogs();
   };
 
@@ -103,15 +97,17 @@ const Blogs = ({
         blogs={blogs}
       />
       <br />
-      {blogs.map((blog, index) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          update={() => likeOnClick(index)}
-          deleteBlog={() => removeOnClick(index)}
-          removable={username === blog.user.username}
-        />
-      ))}
+      {blogs.map((blog, index) => {
+        return (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            update={() => likeOnClick(index)}
+            deleteBlog={() => removeOnClick(index)}
+            removable={name === blog.user.name}
+          />
+        );
+      })}
     </div>
   );
 };

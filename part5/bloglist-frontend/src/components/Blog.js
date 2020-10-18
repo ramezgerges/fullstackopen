@@ -15,26 +15,24 @@ const Blog = ({ blog, update, deleteBlog, removable = false }) => {
   };
 
   return (
-    <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author} &nbsp;
-        <button onClick={() => setVisible(!visible)}>
-          {visible ? "hide" : "show"}
-        </button>
-        <br />
-        {visible && (
-          <div>
-            {blog.url}
-            <br />
-            likes {blog.likes} &nbsp;
-            <button onClick={update}>like</button>
-            <br />
-            {blog.user.name}
-            <br />
-            {removable && <button onClick={deleteBlog}>remove</button>}
-          </div>
-        )}
-      </div>
+    <div className="blogs" style={blogStyle}>
+      {blog.title} {blog.author} &nbsp;
+      <button onClick={() => setVisible(!visible)}>
+        {visible ? "hide" : "show"}
+      </button>
+      <br />
+      {visible && (
+        <div>
+          {blog.url}
+          <br />
+          likes {blog.likes} &nbsp;
+          <button onClick={update}>like</button>
+          <br />
+          {blog.user.name}
+          <br />
+          {removable && <button onClick={deleteBlog}>remove</button>}
+        </div>
+      )}
     </div>
   );
 };

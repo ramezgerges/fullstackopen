@@ -13,7 +13,9 @@ const App = () => {
   useEffect(() => {
     const userJSON = window.localStorage.getItem("user");
     if (userJSON) {
-      setUser(JSON.parse(userJSON));
+      const userObject = JSON.parse(userJSON);
+      setUser(userObject);
+      blogService.setToken(userObject.token);
     }
   }, []);
 

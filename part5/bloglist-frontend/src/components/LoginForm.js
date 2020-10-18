@@ -10,7 +10,7 @@ const LoginForm = ({
   handleLogin,
   message,
 }) => (
-  <form onSubmit={handleLogin}>
+  <form id="loginform" onSubmit={handleLogin}>
     <div>
       <h2>log in to application</h2>
       username

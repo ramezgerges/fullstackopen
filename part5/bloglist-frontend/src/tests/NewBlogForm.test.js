@@ -34,7 +34,7 @@ describe("Blog tests", () => {
     const title = component.container.querySelector('input[name="Title"]');
     const author = component.container.querySelector('input[name="Author"]');
     const url = component.container.querySelector('input[name="Url"]');
-    const button = component.container.querySelector('input[type="button"]');
+    const button = component.container.querySelector("#create");
 
     fireEvent.change(title, {
       target: { value: blog.title },

@@ -2,13 +2,7 @@ import React, { useRef, useState } from "react";
 import Toggleable from "./Toggleable";
 import { PropTypes } from "prop-types";
 
-const NewBlogForm = ({
-  create,
-  blogs,
-  setBlogs,
-  setMessage,
-  toggleVisibility,
-}) => {
+const NewBlogForm = ({ create, blogs, setBlogs, setMessage }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -24,7 +18,7 @@ const NewBlogForm = ({
         text: "A new blog was added successfully.",
       });
       setTimeout(() => setMessage(null), 5000);
-      if (toggleVisibility) toggleVisibility();
+      if (newBlogRef.current) newBlogRef.current.toggleVisibility();
       setUrl("");
       setAuthor("");
       setTitle("");
@@ -42,7 +36,7 @@ const NewBlogForm = ({
 
   return (
     <Toggleable ref={newBlogRef} buttonLabel="Create">
-      <div>
+      <div id="newblog">
         title:
         <input
           type="text"
@@ -67,7 +61,9 @@ const NewBlogForm = ({
           onChange={({ target }) => setUrl(target.value)}
         />
         <br />
-        <input type="button" value="create" onClick={onClick} />
+        <button id="create" onClick={onClick}>
+          create
+        </button>
       </div>
     </Toggleable>
   );
