@@ -6,21 +6,22 @@ const notificationReducer = (state = null, action) => {
   return state;
 };
 
-export const setNotification = (notification) => {
-  return {
-    type: "SET_NOTIF",
-    data: {
-      notification,
-    },
-  };
-};
-
-export const removeNotification = () => {
-  return {
-    type: "SET_NOTIF",
-    data: {
-      notification: null,
-    },
+export const setNotification = (notification, delay) => {
+  return async (dispatch) => {
+    dispatch({
+      type: "SET_NOTIF",
+      data: {
+        notification,
+      },
+    });
+    setTimeout(() => {
+      dispatch({
+        type: "SET_NOTIF",
+        data: {
+          notification: null,
+        },
+      });
+    }, delay * 1000);
   };
 };
 
