@@ -1,7 +1,11 @@
 const notificationReducer = (state = null, action) => {
+  if (state?.timeout) clearTimeout(state.timeout);
   switch (action.type) {
     case "SET_NOTIF":
-      return action.data.notification;
+      return {
+        notification: action.data.notification,
+        timeout: action.data.timeout,
+      };
   }
   return state;
 };
@@ -12,16 +16,16 @@ export const setNotification = (notification, delay) => {
       type: "SET_NOTIF",
       data: {
         notification,
+        timeout: setTimeout(() => {
+          dispatch({
+            type: "SET_NOTIF",
+            data: {
+              notification: null,
+            },
+          });
+        }, delay * 1000),
       },
     });
-    setTimeout(() => {
-      dispatch({
-        type: "SET_NOTIF",
-        data: {
-          notification: null,
-        },
-      });
-    }, delay * 1000);
   };
 };
 
