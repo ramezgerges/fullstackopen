@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import NewBlogForm from "./NewBlogForm";
-import Blog from "./Blog";
 import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 import { setUser } from "../reducers/userReducer";
@@ -11,6 +10,16 @@ import {
   removeBlog,
   updateBlogLikes,
 } from "../reducers/blogReducer";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const Blogs = ({
   blogService,
@@ -46,9 +55,26 @@ const Blogs = ({
         blogs={blogs}
       />
       <br />
-      {blogs.map((blog) => {
-        return <Blog key={blog.id} blog={blog} />;
-      })}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead style={{ backgroundColor: "darkgrey" }}>
+            <TableRow>
+              <TableCell>Blog</TableCell>
+              <TableCell>Author</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {blogs.map((blog) => (
+              <TableRow key={blog.id}>
+                <TableCell>
+                  <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                </TableCell>
+                <TableCell>{blog.author}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

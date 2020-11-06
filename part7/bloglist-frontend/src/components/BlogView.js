@@ -1,8 +1,11 @@
+import "fontsource-roboto";
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useParams } from "react-router";
 import blogService from "../services/blogService";
 import { setNotification } from "../reducers/notificationReducer";
+import { Button, TextField } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const BlogView = ({ setNotification }) => {
   const [blog, setBlog] = useState(null);
@@ -48,6 +51,7 @@ const BlogView = ({ setNotification }) => {
   };
 
   const addComment = async (event) => {
+    event.preventDefault();
     try {
       const response = await blogService.commentOnBlog(
         blog.id,
@@ -77,14 +81,18 @@ const BlogView = ({ setNotification }) => {
       <a href={blog.url}>{blog.url}</a>
       <br />
       likes {blog.likes} &nbsp;
-      <button onClick={likeOnClick}>like</button>
+      <Button variant="outlined" size="small" onClick={likeOnClick}>
+        like
+      </Button>
       <br />
-      added by {blog.user.name}
+      added by <Link to={`/users/${blog.user.id}`}>{blog.user.name}</Link>
       <br />
       <h3>comments</h3>
       <form onSubmit={addComment}>
-        <input name="comment" type="text" />
-        <button type="submit">add comment</button>
+        <TextField required label="comment" name="comment" type="text" />
+        <Button variant="contained" type="submit" size="small">
+          add comment
+        </Button>
       </form>
       <ul>
         {blog.comments.map((comment, index) => (

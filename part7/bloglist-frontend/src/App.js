@@ -59,13 +59,12 @@ const App = ({ user, setUser, setNotification }) => {
 
   return (
     <div>
+      <Notification />
       {user === null ? (
         <LoginForm handleLogin={handleLogin} />
       ) : (
         <div>
           <Navigation logout={logout} />
-          <h2>blog app</h2>
-          <Notification />
           <Switch>
             <Route exact path="/">
               <Blogs blogService={blogService} />
