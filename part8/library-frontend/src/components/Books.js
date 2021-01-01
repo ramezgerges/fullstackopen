@@ -1,12 +1,20 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery, useSubscription } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { ALL_BOOKS, GET_BOOKS_BY_GENRE } from "../queries";
+import { ALL_BOOKS, BOOK_ADDED, GET_BOOKS_BY_GENRE } from "../queries";
 
 const Books = (props) => {
   const [genre, setGenre] = useState(null);
   const [books, setBooks] = useState(null);
   const [getBooksByGenre, resultByGenre] = useLazyQuery(GET_BOOKS_BY_GENRE);
   const result = useQuery(ALL_BOOKS);
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      props.updateCacheWith(subscriptionData.data.bookAdded);
+      if (result?.data) result.refetch();
+      if (resultByGenre?.data) resultByGenre.refetch();
+    },
+  });
 
   useEffect(() => {
     if (genre)

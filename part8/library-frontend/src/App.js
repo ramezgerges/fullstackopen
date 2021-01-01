@@ -5,7 +5,7 @@ import Books from "./components/Books";
 import LoginForm from "./components/LoginForm";
 import NewBook from "./components/NewBook";
 import RecommendedBooks from "./components/RecommendedBooks";
-import { LOGIN } from "./queries";
+import { ALL_BOOKS, GET_BOOKS_BY_GENRE, LOGIN } from "./queries";
 
 const App = () => {
   const client = useApolloClient();
@@ -23,8 +23,8 @@ const App = () => {
   useEffect(() => {
     if (result.data) {
       const token = result.data.login.value;
-      setToken(token);
       localStorage.setItem("usertoken", token);
+      setToken(token);
     }
   }, [result.data]);
 
@@ -42,7 +42,35 @@ const App = () => {
   const logout = () => {
     setToken(null);
     localStorage.clear();
-    client.resetStore();
+    setPage("authors");
+    client.clearStore();
+  };
+
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) =>
+      set.map((p) => p.id).includes(object.id);
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS });
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: dataInStore.allBooks.concat(addedBook) },
+      });
+    }
+    addedBook.genres.forEach((genre) => {
+      const dataInStore = client.readQuery({
+        query: GET_BOOKS_BY_GENRE,
+        variables: {
+          genre,
+        },
+      });
+      if (!includedIn(dataInStore.allBooks, addedBook)) {
+        client.writeQuery({
+          query: GET_BOOKS_BY_GENRE,
+          data: { allBooks: dataInStore.allBooks.concat(addedBook) },
+        });
+      }
+    });
   };
 
   return (
@@ -60,10 +88,13 @@ const App = () => {
           <button onClick={() => setPage("login")}>login</button>
         )}
       </div>
-      <Authors show={page === "authors"} />
-      <Books show={page === "books"} />
-      <RecommendedBooks show={page === "recommended"} />
-      <NewBook show={page === "add"} />
+      <Authors show={page === "authors"} authenticated={token !== null} />
+      <Books show={page === "books"} updateCacheWith={updateCacheWith} />
+      <RecommendedBooks
+        show={page === "recommended"}
+        authenticated={token !== null}
+      />
+      <NewBook show={page === "add"} updateCacheWith={updateCacheWith} />
       <LoginForm show={page === "login"} handleLogin={handleLogin} />
     </div>
   );

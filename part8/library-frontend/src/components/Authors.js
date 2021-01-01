@@ -50,12 +50,16 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <h3>Set birthyear</h3>
-      <form onSubmit={changeAuthorBirthyear}>
-        <Select defaultValue={name} onChange={setName} options={options} />
-        born <input name="year" type="text" /> <br />
-        <button type="submit">update author</button>
-      </form>
+      {props.authenticated && (
+        <div>
+          <h3>Set birthyear</h3>
+          <form onSubmit={changeAuthorBirthyear}>
+            <Select defaultValue={name} onChange={setName} options={options} />
+            born <input name="year" type="text" /> <br />
+            <button type="submit">update author</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

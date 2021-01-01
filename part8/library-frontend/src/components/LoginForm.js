@@ -13,8 +13,14 @@ const LoginForm = ({ handleLogin, show }) => {
     marginBottom: 7,
   };
 
+  const login = (event) => {
+    handleLogin(event);
+    setUsername("");
+    setPassword("");
+  };
+
   return (
-    <form id="loginform" onSubmit={handleLogin}>
+    <form id="loginform" onSubmit={login}>
       <h2>log in to application</h2>
       <TextField
         required

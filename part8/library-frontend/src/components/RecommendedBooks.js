@@ -1,17 +1,29 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useSubscription } from "@apollo/client";
 import React, { useEffect } from "react";
-import { ALL_BOOKS, GET_FAV_GENRE } from "../queries";
+import { BOOK_ADDED, GET_BOOKS_BY_GENRE, GET_FAV_GENRE } from "../queries";
 
 const RecommendedBooks = (props) => {
-  const [getBooks, result] = useLazyQuery(ALL_BOOKS);
-  const genreResult = useQuery(GET_FAV_GENRE);
+  const [getBooks, result] = useLazyQuery(GET_BOOKS_BY_GENRE);
+  const [getGenre, genreResult] = useLazyQuery(GET_FAV_GENRE, {
+    onError: (error) => console.log(error),
+  });
+
+  useEffect(() => {
+    if (props.authenticated) getGenre();
+  }, [getGenre, props]);
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      if (result?.data) result.refetch();
+    },
+  });
 
   useEffect(() => {
     const genre = genreResult?.data?.me.favoriteGenre;
     if (genre) getBooks({ variables: { genre } });
   }, [genreResult, getBooks]);
 
-  if (!props.show || !result.data) {
+  if (!props.show || !result.data || !props.authenticated) {
     return null;
   }
 

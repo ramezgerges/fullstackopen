@@ -3,7 +3,10 @@ const {
   gql,
   UserInputError,
   AuthenticationError,
+  PubSub,
 } = require("apollo-server");
+const pubsub = new PubSub();
+
 require("dotenv").config();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -70,6 +73,9 @@ const typeDefs = gql`
     createUser(username: String!, favoriteGenre: String!): User
     login(username: String!, password: String!): Token
   }
+  type Subscription {
+    bookAdded: Book!
+  }
 `;
 
 const resolvers = {
@@ -135,6 +141,7 @@ const resolvers = {
           invalidArgs: args,
         });
       }
+      pubsub.publish("BOOK_ADDED", { bookAdded: newBook });
       return newBook;
     },
     editAuthor: async (root, args, context) => {
@@ -173,6 +180,11 @@ const resolvers = {
         id: user._id,
       };
       return { value: jwt.sign(userForToken, JWT_SECRET) };
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(["BOOK_ADDED"]),
     },
   },
 };
